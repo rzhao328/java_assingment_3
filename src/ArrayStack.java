@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-public class implement ArrayStack<T> {
+public class ArrayStack<T> implements StackADT<T> {
     private T[] array; // this array holds the items in the stack
     private int top;
 
