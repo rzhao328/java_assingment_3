@@ -12,7 +12,7 @@ public class ArrayStack<T> implements StackADT<T> {
     }
 
     /**
-     * constructor with a initial of the capacity of this stack
+     * constructor with an initial of the capacity of this stack
      * @param initCapacity the capacity of this stack
      */
     public ArrayStack(int initCapacity) {
@@ -42,52 +42,84 @@ public class ArrayStack<T> implements StackADT<T> {
         if (this.isEmpty()) {
             throw new CollectionException("Stack is empty");
         }
-        T item = array[top];
-        array[top--] = null;
+        int topIndex = this.getTop();
+        T item = array[topIndex];
+        topIndex--;
+        array[topIndex] = null;
         return item;
     }
 
+    /**
+     * peek the first element of the stack
+     *
+     * @return the first element of the stack
+     * @throws CollectionException when the stack is empty
+     */
     public T peek() throws CollectionException {
+        // check is the stack is empty, throw an exception
         if (this.isEmpty()) {
             throw new CollectionException("Stack is empty");
         }
-        // check is the stack is empty, throw an exception
-        return array[top];//return the top element without removing it
+        int topIndex = this.getTop();
+        return array[topIndex];//return the top element without removing it
     }
 
+    /**
+     *
+     * @return ture, if the stack is empty
+     */
     public boolean isEmpty() {
         return top == -1;
     }
 
+    /**
+     *
+     * @return the number of the elements in the stack
+     */
     public int size() {
         return top + 1;
     }
 
+    /**
+     *
+     * @return the length capacity of array
+     */
     public int getCapacity() {
         return array.length;
     }
 
+    /**
+     *
+     * @return the top index
+     */
     public int getTop() {
         return top;
     }
 
+    /**
+     * build and return a string containing all the items in the stack starting from the top to the bottom
+     * @return a string containing all the items in the stack or "Empty Stack" when the stack is empty
+     */
     public String toString() {
-        if (top == -1) {
+        if (this.isEmpty()) {
             return "Empty Stack";
         }
 
         StringBuilder result = new StringBuilder();
-        for (int i = top + 1; i < array.length; i++){
+        for (int i = array.length - 1; i > -1 ; i--){
             result.append(array[i]);
-            if (i < array.length - 1){
-                result.append(", ");
+                if (i != 0){
+                    result.append(", ");
             }
         }
         return result.toString();
     }
 
+    /**
+     * a helper method, expand the current capacity when the array is full and another item needs to be pushed on
+     */
     private void expandCapacity() {
-        int currentCapacity = array.length;
+        int currentCapacity = getCapacity();
         int newCapacity;
 
         //if the current array capacity is 15 or less, then expand it by doubling its current capacity
@@ -105,6 +137,5 @@ public class ArrayStack<T> implements StackADT<T> {
             newArray[i + shift] = array[i];
         }
         array = newArray;
-        top = top + shift;
     }
 }
