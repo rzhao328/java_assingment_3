@@ -133,7 +133,10 @@ public class CampusWalk {
         Hexagon current = null;
         while (running && !stack.isEmpty()) {
             current = stack.peek();
-            pathString.append(current.getID()).append(" ");
+            if (pathString.length() > 0) {
+                pathString.append(" ");
+            }
+            pathString.append(current.getID());
             if (current.isEnd()) {
                 running = false;
             }
@@ -160,11 +163,13 @@ public class CampusWalk {
         this.map.exit();
     }
 
+    // the given data to test function
     public static void main(String[] args) {
         Hexagon.TIME_DELAY = 500; // Change speed of animation.
         String file = "map1.txt"; // Change when trying other maps.
         CampusWalk walk = new CampusWalk(file, true);
         String result = walk.findPath();
         System.out.println(result);
+        walk.exit();
     }
 }
