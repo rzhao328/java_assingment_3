@@ -2,7 +2,7 @@ import java.util.Arrays;
 
 public class ArrayStack<T> implements StackADT<T> {
     private T[] array; // this array holds the items in the stack
-    private int top;
+    private int top; // the index of the top element in the array
 
     /**
      * default constructor
@@ -16,8 +16,8 @@ public class ArrayStack<T> implements StackADT<T> {
      * @param initCapacity the capacity of this stack
      */
     public ArrayStack(int initCapacity) {
-        array = (T[]) new Object[initCapacity];
-        top = -1;
+        this.array = (T[]) new Object[initCapacity];
+        this.top = -1;
     }
 
     /**
@@ -26,10 +26,10 @@ public class ArrayStack<T> implements StackADT<T> {
      * @param element data item to be pushed onto stack
      */
     public void push(T element) {
-        if (top == array.length - 1) {
+        if (this.top == array.length - 1) {
             this.expandCapacity();
         }
-        array[++top] = element;
+        array[++this.top] = element;
     }
 
     /**
@@ -42,10 +42,8 @@ public class ArrayStack<T> implements StackADT<T> {
         if (this.isEmpty()) {
             throw new CollectionException("Stack is empty");
         }
-        int topIndex = this.getTop();
-        T item = array[topIndex];
-        topIndex--;
-        array[topIndex] = null;
+        T item = array[this.top];
+        array[this.top--] = null;
         return item;
     }
 
@@ -60,8 +58,7 @@ public class ArrayStack<T> implements StackADT<T> {
         if (this.isEmpty()) {
             throw new CollectionException("Stack is empty");
         }
-        int topIndex = this.getTop();
-        return array[topIndex];//return the top element without removing it
+        return array[this.top];//return the top element without removing it
     }
 
     /**
@@ -69,7 +66,7 @@ public class ArrayStack<T> implements StackADT<T> {
      * @return ture, if the stack is empty
      */
     public boolean isEmpty() {
-        return top == -1;
+        return this.top == -1;
     }
 
     /**
@@ -77,7 +74,7 @@ public class ArrayStack<T> implements StackADT<T> {
      * @return the number of the elements in the stack
      */
     public int size() {
-        return top + 1;
+        return this.top + 1;
     }
 
     /**
@@ -85,7 +82,7 @@ public class ArrayStack<T> implements StackADT<T> {
      * @return the length capacity of array
      */
     public int getCapacity() {
-        return array.length;
+        return this.array.length;
     }
 
     /**
@@ -93,7 +90,7 @@ public class ArrayStack<T> implements StackADT<T> {
      * @return the top index
      */
     public int getTop() {
-        return top;
+        return this.top;
     }
 
     /**
@@ -106,11 +103,11 @@ public class ArrayStack<T> implements StackADT<T> {
         }
 
         StringBuilder result = new StringBuilder();
-        for (int i = array.length - 1; i > -1 ; i--){
-            result.append(array[i]);
-                if (i != 0){
-                    result.append(", ");
+        for (int i = this.top; i > -1 ; i--) {
+            if (i != this.top) {
+                result.append(", ");
             }
+            result.append(array[i]);
         }
         return result.toString();
     }
@@ -132,10 +129,9 @@ public class ArrayStack<T> implements StackADT<T> {
         }
         T[] newArray = (T[]) new Object[newCapacity];
 
-        int shift = newCapacity - currentCapacity;
         for (int i = 0; i < currentCapacity; i++) {
-            newArray[i + shift] = array[i];
+            newArray[i] = this.array[i];
         }
-        array = newArray;
+        this.array = newArray;
     }
 }
