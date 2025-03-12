@@ -1,5 +1,7 @@
-import java.util.Arrays;
-
+/**
+ * This class use array and a top index to implement the StackADT interface
+ * @param <T> The Type of elements in the stack
+ */
 public class ArrayStack<T> implements StackADT<T> {
     private T[] array; // this array holds the items in the stack
     private int top; // the index of the top element in the array
