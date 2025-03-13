@@ -49,6 +49,8 @@ public class CampusWalk {
      */
     public Hexagon findBest(Hexagon cell) {
         Hexagon bestChoice = null;
+        int bookCellIndex = -1, grassCellIndex = -1, snowCellIndex = -1;
+        int lowestGooseCount = Integer.MAX_VALUE;
         // loop each neighbour cell of current cell
         for (int i = 0; i < HEXAGON_SIZE; i++) {
             Hexagon neighbour = cell.getNeighbour(i);
@@ -73,37 +75,27 @@ public class CampusWalk {
             }
             // if curr is adjacent to one or more cells that contain a book, go to the book cell neighbour with the smallest index (
             if (neighbour.isBookCell()) {
-                bestChoice = neighbour;
-                break;
-            }
-        }
-        if (bestChoice == null) { // bestChoice is null here means no book cell or end cell is adjacent
-            /* if curr is adjacent to one or more grass cells,
-             * go to the grass cell neighbour with the smallest index
-             * that has the lowest goose-neighbour-count.
-             */
-            int lowestGooseCount = Integer.MAX_VALUE;
-            for (int i = 0; i < HEXAGON_SIZE; i++) {
-                Hexagon neighbour = cell.getNeighbour(i);
-                if (neighbour != null && neighbour.isGrassCell()) {
-                    int gooseCount = neighbourGooseCount(neighbour);
-                    if (gooseCount < lowestGooseCount) {
-                        lowestGooseCount = gooseCount;
-                        bestChoice = neighbour;
-                    }
+                if (bookCellIndex == -1) {
+                    bookCellIndex = i;
                 }
             }
-        }
-        if (bestChoice == null) { // bestChoice is null here means no grass cell with 2 or less goose-neighbour-count cell is adjacent
-            /* if curr is adjacent to one or more snow cells,
-             * go to the snow cell with the smallest index.
-             */
-            for (int i = 0; i < HEXAGON_SIZE; i++) {
-                Hexagon neighbour = cell.getNeighbour(i);
-                if (neighbour != null && neighbour.isSnowCell()) {
-                    bestChoice = neighbour;
+            if(neighbour.isGrassCell()) {
+                int gooseCount = neighbourGooseCount(neighbour);
+                if (gooseCount < lowestGooseCount) {
+                    lowestGooseCount = gooseCount;
+                    grassCellIndex = i;
                 }
             }
+            if (neighbour.isSnowCell()) {
+                snowCellIndex = i;
+            }
+        }
+        if (bookCellIndex > -1) {
+            bestChoice = cell.getNeighbour(bookCellIndex);
+        } else if  (grassCellIndex > -1) {
+            bestChoice = cell.getNeighbour(grassCellIndex);
+        } else if  (snowCellIndex > -1) {
+            bestChoice = cell.getNeighbour(snowCellIndex);
         }
         return bestChoice;
     }
@@ -133,7 +125,7 @@ public class CampusWalk {
         Hexagon current = null;
         while (running && !stack.isEmpty()) {
             current = stack.peek();
-            if (pathString.length() > 0) {
+            if (!pathString.isEmpty()) {
                 pathString.append(" ");
             }
             pathString.append(current.getID());
@@ -165,8 +157,8 @@ public class CampusWalk {
 
     // the given data to test function
     public static void main(String[] args) {
-        Hexagon.TIME_DELAY = 500; // Change speed of animation.
-        String file = "map1.txt"; // Change when trying other maps.
+        Hexagon.TIME_DELAY = 1000; // Change speed of animation.
+        String file = "map2.txt"; // Change when trying other maps.
         CampusWalk walk = new CampusWalk(file, true);
         String result = walk.findPath();
         System.out.println(result);
