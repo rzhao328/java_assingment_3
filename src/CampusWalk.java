@@ -1,11 +1,11 @@
-import java.util.Stack;
-
 /**
- *
+ * The CapusWalk class is responsible for navigating a hexagonal grid map
+ * to find a path from the starting position to the end cell.
  */
 public class CampusWalk {
     private Map map; //
     private static final int HEXAGON_SIZE = 6; //
+
     /**
      * constructor
      * @param filename the location of file that will initiate the MapFrame
@@ -13,11 +13,11 @@ public class CampusWalk {
      */
     public CampusWalk(String filename, boolean showMap) {
         try {
-            map = new Map(filename);
+            map = new Map(filename); // Load map from the file
             if (showMap) {
-                map.showGUI();
+                map.showGUI(); // Show map visualization
             } else {
-                map.hideGUI();
+                map.hideGUI(); // Hide map visualization
             }
         } catch (Exception e) {
             System.out.println("Error occurred");
@@ -34,6 +34,7 @@ public class CampusWalk {
         // get all neighbour cells
         for (int i = 0; i < HEXAGON_SIZE; i++) {
             Hexagon neighbour = cell.getNeighbour(i);
+            // if the neighbor exists and is a goose cell, increase the count
             if (neighbour != null && neighbour.isGooseCell()) {
                 count++;
             }
@@ -51,6 +52,7 @@ public class CampusWalk {
         Hexagon bestChoice = null;
         int bookCellIndex = -1, grassCellIndex = -1, snowCellIndex = -1;
         int lowestGooseCount = Integer.MAX_VALUE;
+
         // loop each neighbour cell of current cell
         for (int i = 0; i < HEXAGON_SIZE; i++) {
             Hexagon neighbour = cell.getNeighbour(i);
@@ -79,6 +81,7 @@ public class CampusWalk {
                     bookCellIndex = i;
                 }
             }
+            // if the neighbor is a grass cell, check its goose count and prioritize
             if(neighbour.isGrassCell()) {
                 int gooseCount = neighbourGooseCount(neighbour);
                 if (gooseCount < lowestGooseCount) {
@@ -86,10 +89,12 @@ public class CampusWalk {
                     grassCellIndex = i;
                 }
             }
+            // if the neighbor is a snow cell, sane its index
             if (neighbour.isSnowCell()) {
                 snowCellIndex = i;
             }
         }
+        // decide with cell to move to based on priority
         if (bookCellIndex > -1) {
             bestChoice = cell.getNeighbour(bookCellIndex);
         } else if  (grassCellIndex > -1) {
@@ -110,11 +115,13 @@ public class CampusWalk {
             return "No path found";
         }
         // initialize Stack
-        Stack<Hexagon> stack = new Stack<>();
+        ArrayStack<Hexagon> stack = new ArrayStack<>();
         Hexagon start = this.map.getStart();
+
         if (start == null) {
-            return "No path found";
+            return "No path found"; // return if no start cell is found
         }
+
         // push the starting cell onto S
         stack.push(start);
         // set a boolean variable running to be true
@@ -123,24 +130,31 @@ public class CampusWalk {
         start.markInStack();
         StringBuilder pathString = new StringBuilder();
         Hexagon current = null;
+
+        // continue until either the stack is empty or the end is reached
         while (running && !stack.isEmpty()) {
-            current = stack.peek();
-            if (!pathString.isEmpty()) {
+            current = stack.peek(); // peek at the top of the stack
+            if (pathString.length() > 0) {
                 pathString.append(" ");
             }
             pathString.append(current.getID());
+
             if (current.isEnd()) {
-                running = false;
+                running = false; // stop if we reached the end
             }
-            Hexagon next = findBest(current);
+
+            Hexagon next = findBest(current); // find the best next step
+
             if (next == null) {
-                stack.pop();
-                current.markOutStack();
+                stack.pop(); // if no valid move is found, backtrack
+                current.markOutStack(); // make the cell as no longer in the stack
             } else {
-                stack.push(next);
-                next.markInStack();
+                stack.push(next); // move to the next cell
+                next.markInStack(); // make the cell as visited
             }
         }
+
+        // return the final path string if a valid path was found
         if (!running) {
             return pathString.toString();
         } else {
@@ -153,15 +167,5 @@ public class CampusWalk {
      */
     public void exit() {
         this.map.exit();
-    }
-
-    // the given data to test function
-    public static void main(String[] args) {
-        Hexagon.TIME_DELAY = 1000; // Change speed of animation.
-        String file = "map2.txt"; // Change when trying other maps.
-        CampusWalk walk = new CampusWalk(file, true);
-        String result = walk.findPath();
-        System.out.println(result);
-        walk.exit();
     }
 }
